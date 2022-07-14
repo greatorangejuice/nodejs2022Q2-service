@@ -1,10 +1,4 @@
-import {
-  BadRequestException,
-  HttpException,
-  HttpStatus,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InMemoryDbService } from '../../common/modules/in-memory-db/in-memory-db.service';
@@ -48,24 +42,36 @@ export class UsersService {
 
   async update(id: string, updateUserDto: UpdateUserDto) {
     try {
-      const oldUser = await this.dbService.findOne<User>(IStoreKey.user, id);
-      if (oldUser && updateUserDto.oldPassword === oldUser.password) {
-        const newUser: User = {
+      const oldUser = await this.findOne(id);
+      if (oldUser) {
+        if (updateUserDto.oldPassword !== oldUser.password) {
+          throw new HttpException('Wrong password', HttpStatus.FORBIDDEN);
+        }
+        const newUser = new User({
           ...oldUser,
           password: updateUserDto.newPassword,
           updatedAt: +new Date().getTime(),
-        };
+          version: oldUser.version + 1,
+        });
         return await this.dbService.updateElement<User>(
           IStoreKey.user,
           newUser,
         );
       }
     } catch (e) {
-      return new HttpException(e.message, HttpStatus.NOT_FOUND);
+      throw new HttpException(e.message, e.status);
     }
   }
 
-  async remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: string) {
+    try {
+      const oldUser = await this.findOne(id);
+      if (oldUser) {
+        await this.dbService.removeElement<User>(IStoreKey.user, oldUser);
+        return HttpStatus.NO_CONTENT;
+      }
+    } catch (e) {
+      throw new HttpException(e.message, e.status);
+    }
   }
 }

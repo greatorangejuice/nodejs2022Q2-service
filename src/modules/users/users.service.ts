@@ -1,9 +1,15 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InMemoryDbService } from '../../common/modules/in-memory-db/in-memory-db.service';
 import { User } from './entities/user.entity';
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4, validate as uuidValidate } from 'uuid';
 import { IStoreKey } from '../../common/common.models';
 
 @Injectable()
@@ -14,9 +20,11 @@ export class UsersService {
     try {
       // check user is exists
       const user = new User(createUserDto);
+      const time = new Date().getTime();
       user.version = 1;
       user.id = uuidv4();
-      user.createdAt = new Date().getTime();
+      user.createdAt = +time;
+      user.updatedAt = +time;
       return await this.dbService.addElement<User>(IStoreKey.user, user);
     } catch (e) {
       return new HttpException(e.message, HttpStatus.BAD_REQUEST);
@@ -27,21 +35,25 @@ export class UsersService {
     return await this.dbService.findAll<User>(IStoreKey.user);
   }
 
-  async findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(id: string) {
+    try {
+      if (!uuidValidate(id)) {
+        throw new HttpException('id is not valid', HttpStatus.BAD_REQUEST);
+      }
+      return await this.dbService.findOne<User>(IStoreKey.user, id);
+    } catch (e) {
+      throw new HttpException(e.message, e.status);
+    }
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto) {
+  async update(id: string, updateUserDto: UpdateUserDto) {
     try {
-      const oldUser = await this.dbService.findOne<User>(
-        IStoreKey.user,
-        updateUserDto.id,
-      );
-      if (oldUser) {
+      const oldUser = await this.dbService.findOne<User>(IStoreKey.user, id);
+      if (oldUser && updateUserDto.oldPassword === oldUser.password) {
         const newUser: User = {
           ...oldUser,
-          ...updateUserDto,
-          updatedAt: new Date().getTime(),
+          password: updateUserDto.newPassword,
+          updatedAt: +new Date().getTime(),
         };
         return await this.dbService.updateElement<User>(
           IStoreKey.user,

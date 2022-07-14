@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 
 @Injectable()
 export class InMemoryDbService {
@@ -16,8 +16,13 @@ export class InMemoryDbService {
   }
 
   async findOne<T>(key, id): Promise<T | null> {
-    const arrId = this.getArrayId(key, id);
-    return arrId ? this.store[key][arrId] : null;
+    const item = this.store[key].find((item) => {
+      return item.id === id;
+    });
+    if (!item) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+    return item;
   }
 
   async findAll<T>(key: string): Promise<Array<T>> {

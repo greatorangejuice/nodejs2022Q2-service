@@ -7,5 +7,6 @@ import { InMemoryDbModule } from '../../common/modules/in-memory-db/in-memory-db
   imports: [InMemoryDbModule],
   controllers: [UsersController],
   providers: [UsersService],
+  exports: [UsersService],
 })
 export class UsersModule {}

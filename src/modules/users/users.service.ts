@@ -3,16 +3,15 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InMemoryDbService } from '../../common/modules/in-memory-db/in-memory-db.service';
 import { User } from './entities/user.entity';
-import { v4 as uuidv4, validate as uuidValidate } from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 import { IStoreKey } from '../../common/common.models';
 
 @Injectable()
 export class UsersService {
   constructor(private dbService: InMemoryDbService) {}
 
-  async create(createUserDto: CreateUserDto) {
+  async create(createUserDto: CreateUserDto): Promise<User> {
     try {
-      // check user is exists
       const user = new User(createUserDto);
       const time = new Date().getTime();
       user.version = 1;
@@ -21,7 +20,7 @@ export class UsersService {
       user.updatedAt = +time;
       return await this.dbService.addElement<User>(IStoreKey.user, user);
     } catch (e) {
-      return new HttpException(e.message, HttpStatus.BAD_REQUEST);
+      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -29,18 +28,15 @@ export class UsersService {
     return await this.dbService.findAll<User>(IStoreKey.user);
   }
 
-  async findOne(id: string) {
+  async findOne(id: string): Promise<User> {
     try {
-      if (!uuidValidate(id)) {
-        throw new HttpException('id is not valid', HttpStatus.BAD_REQUEST);
-      }
       return await this.dbService.findOne<User>(IStoreKey.user, id);
     } catch (e) {
       throw new HttpException(e.message, e.status);
     }
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto) {
+  async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
     try {
       const oldUser = await this.findOne(id);
       if (oldUser) {
@@ -68,7 +64,7 @@ export class UsersService {
       const oldUser = await this.findOne(id);
       if (oldUser) {
         await this.dbService.removeElement<User>(IStoreKey.user, oldUser);
-        return HttpStatus.NO_CONTENT;
+        return { removed: true };
       }
     } catch (e) {
       throw new HttpException(e.message, e.status);

@@ -1,10 +1,14 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { validate as uuidValidate } from 'uuid';
+import { IStoreKey } from '../../common.models';
 
 @Injectable()
 export class InMemoryDbService {
   store = {
     users: [],
     artists: [],
+    tracks: [],
+    albums: [],
   };
 
   cash = {
@@ -18,6 +22,9 @@ export class InMemoryDbService {
   }
 
   async findOne<T>(key, id): Promise<T | null> {
+    if (!uuidValidate(id)) {
+      throw new HttpException('id is not valid', HttpStatus.BAD_REQUEST);
+    }
     const item = this.store[key].find((item) => {
       return item.id === id;
     });
@@ -52,11 +59,16 @@ export class InMemoryDbService {
   async removeElement<T>(key: string, element: any) {
     const dbItem = await this.findOne<T>(key, element.id);
     if (dbItem) {
-      const newStore = this.store[key].filter((item) => item.id !== element.id);
-      this.store[key] = newStore;
+      this.store[key] = this.store[key].filter(
+        (item) => item.id !== element.id,
+      );
       return true;
     } else {
       return false;
     }
+  }
+
+  async loopInStore(filter: any) {
+    this.store[filter.storeField].forEach(filter.cb);
   }
 }

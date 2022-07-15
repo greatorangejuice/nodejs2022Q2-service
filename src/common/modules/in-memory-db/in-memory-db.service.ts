@@ -9,6 +9,11 @@ export class InMemoryDbService {
     artists: [],
     tracks: [],
     albums: [],
+    favorites: {
+      artists: [],
+      tracks: [],
+      albums: [],
+    },
   };
 
   cash = {
@@ -28,6 +33,7 @@ export class InMemoryDbService {
     const item = this.store[key].find((item) => {
       return item.id === id;
     });
+    console.log(`${key}, item: ${item}`);
     if (item) {
       return item;
     } else {
@@ -70,5 +76,19 @@ export class InMemoryDbService {
 
   async loopInStore(filter: any) {
     this.store[filter.storeField].forEach(filter.cb);
+  }
+
+  async addFavorite(key: IStoreKey, id: string) {
+    this.store.favorites[key].push(id);
+  }
+
+  async removeFavorite(key: IStoreKey, id: string) {
+    this.store.favorites[key] = this.store.favorites[key].filter(
+      (item) => item.id !== id,
+    );
+  }
+
+  async findAllFavorites<T>(key: string): Promise<T> {
+    return this.store[key];
   }
 }

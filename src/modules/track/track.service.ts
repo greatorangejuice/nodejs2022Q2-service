@@ -56,6 +56,7 @@ export class TrackService {
     try {
       const oldTrack = await this.findOne(id);
       if (oldTrack) {
+        // await this.favoritesService.remove(id, IStoreKey.track);
         await this.dbService.removeElement<Track>(IStoreKey.track, oldTrack);
         return { removed: true };
       }

@@ -1,14 +1,25 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  forwardRef,
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { Track } from './entities/track.entity';
 import { v4 as uuidv4 } from 'uuid';
 import { IStoreKey } from '../../common/common.models';
 import { InMemoryDbService } from '../../common/modules/in-memory-db/in-memory-db.service';
+import { FavoritesService } from '../favorites/favorites.service';
 
 @Injectable()
 export class TrackService {
-  constructor(private readonly dbService: InMemoryDbService) {}
+  constructor(
+    @Inject(forwardRef(() => FavoritesService))
+    private readonly favoritesService: FavoritesService,
+    private readonly dbService: InMemoryDbService,
+  ) {}
 
   async create(createTrackDto: CreateTrackDto): Promise<Track> {
     try {
@@ -56,7 +67,7 @@ export class TrackService {
     try {
       const oldTrack = await this.findOne(id);
       if (oldTrack) {
-        // await this.favoritesService.remove(id, IStoreKey.track);
+        await this.favoritesService.remove(id, IStoreKey.track);
         await this.dbService.removeElement<Track>(IStoreKey.track, oldTrack);
         return { removed: true };
       }

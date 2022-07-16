@@ -33,7 +33,6 @@ export class InMemoryDbService {
     const item = this.store[key].find((item) => {
       return item.id === id;
     });
-    console.log(`${key}, item: ${item}`);
     if (item) {
       return item;
     } else {
@@ -83,9 +82,10 @@ export class InMemoryDbService {
   }
 
   async removeFavorite(key: IStoreKey, id: string) {
-    this.store.favorites[key] = this.store.favorites[key].filter(
-      (item) => item.id !== id,
-    );
+    this.store.favorites[key] = this.store.favorites[key].filter((itemId) => {
+      return itemId !== id;
+    });
+    return true;
   }
 
   async findAllFavorites<T>(key: string): Promise<T> {

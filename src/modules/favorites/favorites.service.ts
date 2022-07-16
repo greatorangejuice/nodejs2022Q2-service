@@ -1,4 +1,10 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  forwardRef,
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { IStoreKey } from '../../common/common.models';
 import { InMemoryDbService } from '../../common/modules/in-memory-db/in-memory-db.service';
 import { Favorite } from './entities/favorite.entity';
@@ -11,13 +17,6 @@ import { Artist } from '../artist/entities/artist.entity';
 
 @Injectable()
 export class FavoritesService {
-  constructor(
-    private readonly dbService: InMemoryDbService,
-    private readonly trackService: TrackService,
-    private readonly artistService: ArtistService,
-    private readonly albumService: AlbumService,
-  ) {}
-
   async create(id: string, key: IStoreKey) {
     try {
       switch (key) {
@@ -52,6 +51,14 @@ export class FavoritesService {
     }
   }
 
+  constructor(
+    @Inject(forwardRef(() => ArtistService))
+    private readonly artistService: ArtistService,
+    private readonly dbService: InMemoryDbService,
+    private readonly trackService: TrackService,
+    private readonly albumService: AlbumService,
+  ) {}
+
   async findAll() {
     try {
       const ids = (await this.dbService.findAllFavorites<Favorite>(
@@ -84,7 +91,6 @@ export class FavoritesService {
         artists.push(this.dbService.findOne<Artist>(IStoreKey.artist, id));
       });
       await Promise.all(artists).then((items) => {
-        console.log('Artists: ', items);
         response.artists.push(...items);
       });
       return response;

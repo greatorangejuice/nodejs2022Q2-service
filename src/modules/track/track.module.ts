@@ -6,7 +6,7 @@ import { ArtistModule } from '../artist/artist.module';
 import { FavoritesModule } from '../favorites/favorites.module';
 
 @Module({
-  imports: [InMemoryDbModule, forwardRef(() => ArtistModule)],
+  imports: [InMemoryDbModule, forwardRef(() => FavoritesModule)],
   controllers: [TrackController],
   providers: [TrackService],
   exports: [TrackService],

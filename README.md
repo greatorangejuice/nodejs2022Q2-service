@@ -20,7 +20,7 @@ npm install
 ## Running application
 
 ```
-npm start
+create .env file using example and npm start
 ```
 
 After starting the app on port (4000 as default) you can open

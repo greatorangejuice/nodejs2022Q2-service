@@ -10,12 +10,12 @@ export class User {
   id: string;
   @ApiProperty({ example: 'New user' })
   login: string;
-  @Exclude()
+  @Exclude({ toPlainOnly: true })
   password: string;
   @ApiProperty({ example: 1 })
   version: number;
   @ApiProperty({ example: 1655000000 })
-  createdAt: number;
+  createdAt: Date;
   @ApiProperty({ example: 1655000000 })
-  updatedAt: number;
+  updatedAt: Date;
 }

@@ -5,6 +5,7 @@ import {
   Get,
   HttpCode,
   Param,
+  ParseUUIDPipe,
   Post,
   Put,
 } from '@nestjs/common';
@@ -61,7 +62,7 @@ export class ArtistController {
     status: 404,
     description: 'Artist is not found',
   })
-  async findOne(@Param('id') id: string) {
+  async findOne(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
     return await this.artistService.findOne(id);
   }
 
@@ -81,7 +82,7 @@ export class ArtistController {
     description: 'Artist is not found',
   })
   async update(
-    @Param('id') id: string,
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
     @Body() updateArtistDto: UpdateArtistDto,
   ) {
     return await this.artistService.update(id, updateArtistDto);
@@ -102,7 +103,7 @@ export class ArtistController {
     status: 404,
     description: 'Artist is not found',
   })
-  async remove(@Param('id') id: string) {
+  async remove(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
     return await this.artistService.remove(id);
   }
 }

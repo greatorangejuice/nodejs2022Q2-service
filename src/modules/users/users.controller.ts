@@ -6,6 +6,7 @@ import {
   Get,
   HttpCode,
   Param,
+  ParseUUIDPipe,
   Post,
   Put,
   UseInterceptors,
@@ -64,7 +65,7 @@ export class UsersController {
     status: 404,
     description: 'User is not found',
   })
-  async findOne(@Param('id') id: string) {
+  async findOne(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
     return await this.usersService.findOne(id);
   }
 
@@ -87,7 +88,10 @@ export class UsersController {
     status: 404,
     description: 'User not found',
   })
-  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+  async update(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
     return await this.usersService.update(id, updateUserDto);
   }
 
@@ -106,7 +110,7 @@ export class UsersController {
     description: 'User not found',
   })
   @HttpCode(204)
-  async remove(@Param('id') id: string) {
+  async remove(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
     return await this.usersService.remove(id);
   }
 }

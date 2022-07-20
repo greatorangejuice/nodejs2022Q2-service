@@ -5,6 +5,7 @@ import { InMemoryDbService } from '../../common/modules/in-memory-db/in-memory-d
 import { PrismaService } from '../../prisma/prisma.service';
 import { User as UserModel } from '@prisma/client';
 import { User } from './entities/user.entity';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class UsersService {
@@ -16,7 +17,7 @@ export class UsersService {
   async create(createUserDto: CreateUserDto): Promise<User> {
     try {
       const user = await this.prisma.user.create({ data: createUserDto });
-      return new User(user);
+      return plainToInstance(User, user);
     } catch (e) {
       throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
     }

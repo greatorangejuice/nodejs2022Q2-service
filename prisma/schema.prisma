@@ -20,11 +20,13 @@ model User {
 }
 
 model Artist {
-  id     String  @id @default(uuid())
-  name   String
-  grammy Boolean
-  Track  Track[]
-  Album  Album[]
+  id          String     @id @default(uuid())
+  name        String
+  grammy      Boolean
+  Track       Track[]
+  Album       Album[]
+  Favorites   Favorites? @relation(fields: [favoritesId], references: [id])
+  favoritesId String?
 }
 
 model Album {
@@ -46,4 +48,13 @@ model Track {
 
   album   Album?  @relation(fields: [albumId], references: [id], onDelete: Cascade)
   albumId String? @unique
+
+}
+
+model Favorites {
+  id      String   @id @default(uuid())
+  artists Artist[]
+
+  //    tracks Track[]
+  //    albums Album[]
 }

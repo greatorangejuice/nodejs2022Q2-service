@@ -17,23 +17,24 @@ model User {
   version   Int      @default(1)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  favorites ArtistsOnUser[]
 }
 
 model Artist {
   id          String     @id @default(uuid())
   name        String
   grammy      Boolean
+
   Track       Track[]
   Album       Album[]
-  Favorites   Favorites? @relation(fields: [favoritesId], references: [id])
-  favoritesId String?
 }
 
 model Album {
   id       String  @id @default(uuid())
   name     String
   year     Int
-  artist   Artist? @relation(fields: [artistId], references: [id], onDelete: Cascade)
+  artist   Artist? @relation(fields: [artistId], references: [id], onDelete: SetNull)
   artistId String? @unique
   Track    Track[]
 }
@@ -43,18 +44,19 @@ model Track {
   name     String
   duration Int    @default(0)
 
-  artist   Artist? @relation(fields: [artistId], references: [id], onDelete: Cascade)
+  artist   Artist? @relation(fields: [artistId], references: [id])
   artistId String? @unique
 
-  album   Album?  @relation(fields: [albumId], references: [id], onDelete: Cascade)
+  album   Album?  @relation(fields: [albumId], references: [id])
   albumId String? @unique
 
 }
 
-model Favorites {
-  id      String   @id @default(uuid())
-  artists Artist[]
+model ArtistsOnUser {
+    user User @relation(fields: [userId], references: [id])
+    userId String
+    artist Artist @relation(fields: [artistId], references: [id], onDelete: SetNull)
+    artistId String
 
-  //    tracks Track[]
-  //    albums Album[]
+    @@id([userId, artistId])
 }

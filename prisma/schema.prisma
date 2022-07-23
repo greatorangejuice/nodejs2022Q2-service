@@ -31,6 +31,7 @@ model Artist {
   Track           Track[]
   Album           Album[]
   favoriteArtists FavoriteArtists[]
+  ArtistFavs      ArtistFavs[]
 }
 
 model Album {
@@ -41,6 +42,7 @@ model Album {
   artistId       String?          @unique
   Track          Track[]
   favoriteAlbums FavoriteAlbums[]
+  AlbumsFavs     AlbumsFavs[]
 }
 
 model Track {
@@ -55,6 +57,7 @@ model Track {
   albumId String? @unique
 
   favoriteTracks FavoriteTracks[]
+  TracksFavs     TracksFavs[]
 }
 
 model FavoriteArtists {
@@ -83,3 +86,54 @@ model FavoriteTracks {
 
   @@id([userId, trackId])
 }
+
+model ArtistFavs {
+  id       String
+  artist   Artist @relation(fields: [artistId], references: [id], onDelete: Cascade)
+  artistId String
+
+  @@id([artistId])
+}
+
+model AlbumsFavs {
+  id      String
+  album   Album  @relation(fields: [albumId], references: [id], onDelete: Cascade)
+  albumId String
+
+  @@id([albumId])
+}
+
+model TracksFavs {
+  id      String
+  track   Track  @relation(fields: [trackId], references: [id], onDelete: Cascade)
+  trackId String
+
+  @@id([trackId])
+}
+
+//model FavoriteArtists {
+//  user     User   @relation(fields: [userId], references: [id])
+//  userId   String
+//  artist   Artist @relation(fields: [artistId], references: [id], onDelete: Cascade)
+//  artistId String
+//
+//  @@id([userId, artistId])
+//}
+//
+//model FavoriteAlbums {
+//  user    User   @relation(fields: [userId], references: [id])
+//  userId  String
+//  album   Album  @relation(fields: [albumId], references: [id], onDelete: Cascade)
+//  albumId String
+//
+//  @@id([userId, albumId])
+//}
+//
+//model FavoriteTracks {
+//  user    User   @relation(fields: [userId], references: [id])
+//  userId  String
+//  track   Track  @relation(fields: [trackId], references: [id], onDelete: Cascade)
+//  trackId String
+//
+//  @@id([userId, trackId])
+//}

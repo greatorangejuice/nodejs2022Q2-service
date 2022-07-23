@@ -1,4 +1,12 @@
-import { Controller, Delete, Get, HttpCode, Param, Post } from '@nestjs/common';
+import {
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  Param,
+  ParseUUIDPipe,
+  Post,
+} from '@nestjs/common';
 import { FavoritesService } from './favorites.service';
 import { IStoreKey } from '../../common/common.models';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -34,7 +42,7 @@ export class FavoritesController {
     status: 422,
     description: 'Track is not found',
   })
-  async addTrack(@Param('id') id: string) {
+  async addTrack(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
     return await this.favoritesService.addTrack(id);
   }
 
@@ -53,8 +61,8 @@ export class FavoritesController {
     status: 404,
     description: 'Track is not found',
   })
-  removeTrack(@Param('id') id: string) {
-    return this.favoritesService.remove(id, IStoreKey.track);
+  removeTrack(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
+    return this.favoritesService.removeTrack(id);
   }
 
   @Post('album/:id')
@@ -71,7 +79,7 @@ export class FavoritesController {
     status: 422,
     description: 'Album is not found',
   })
-  async addAlbum(@Param('id') id: string) {
+  async addAlbum(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
     return await this.favoritesService.addAlbum(id);
   }
 
@@ -90,8 +98,8 @@ export class FavoritesController {
     status: 404,
     description: 'Album is not found',
   })
-  removeAlbum(@Param('id') id: string) {
-    return this.favoritesService.remove(id, IStoreKey.album);
+  removeAlbum(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
+    return this.favoritesService.removeAlbum(id);
   }
 
   @Post('artist/:id')
@@ -108,7 +116,9 @@ export class FavoritesController {
     status: 422,
     description: 'Artist is not found',
   })
-  async addArtist(@Param('id') id: string) {
+  async addArtist(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+  ) {
     return await this.favoritesService.addArtist(id);
   }
 
@@ -127,7 +137,7 @@ export class FavoritesController {
     status: 404,
     description: 'Artist is not found',
   })
-  removeArtist(@Param('id') id: string) {
-    return this.favoritesService.remove(id, IStoreKey.artist);
+  removeArtist(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
+    return this.favoritesService.removeArtist(id);
   }
 }

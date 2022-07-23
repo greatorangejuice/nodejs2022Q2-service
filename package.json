@@ -22,7 +22,8 @@
     "prisma:migrate": "npx prisma migrate dev --name init",
     "prisma:generate": "npx prisma generate",
     "prisma:format": "npx prisma format",
-    "start:migrate:prod": "prisma migrate deploy && npm run start:prod"
+    "start:migrate:prod": "prisma migrate deploy && npm run start:prod",
+    "docker:scan": "docker scan nodejs2022q2-service_service"
   },
   "dependencies": {
     "@nestjs/common": "^8.0.0",

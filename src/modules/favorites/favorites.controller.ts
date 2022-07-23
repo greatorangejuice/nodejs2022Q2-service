@@ -35,7 +35,7 @@ export class FavoritesController {
     description: 'Track is not found',
   })
   async addTrack(@Param('id') id: string) {
-    return await this.favoritesService.create(id, IStoreKey.track);
+    return await this.favoritesService.addTrack(id);
   }
 
   @Delete('track/:id')
@@ -72,7 +72,7 @@ export class FavoritesController {
     description: 'Album is not found',
   })
   async addAlbum(@Param('id') id: string) {
-    return await this.favoritesService.create(id, IStoreKey.album);
+    return await this.favoritesService.addAlbum(id);
   }
 
   @Delete('album/:id')
@@ -109,7 +109,7 @@ export class FavoritesController {
     description: 'Artist is not found',
   })
   async addArtist(@Param('id') id: string) {
-    return await this.favoritesService.create(id, IStoreKey.artist);
+    return await this.favoritesService.addArtist(id);
   }
 
   @Delete('artist/:id')

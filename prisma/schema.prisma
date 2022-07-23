@@ -18,25 +18,29 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  favorites ArtistsOnUser[]
+  favoriteArtists FavoriteArtists[]
+  favoriteAlbums  FavoriteAlbums[]
+  favoriteTracks  FavoriteTracks[]
 }
 
 model Artist {
-  id          String     @id @default(uuid())
-  name        String
-  grammy      Boolean
+  id     String  @id @default(uuid())
+  name   String
+  grammy Boolean
 
-  Track       Track[]
-  Album       Album[]
+  Track           Track[]
+  Album           Album[]
+  favoriteArtists FavoriteArtists[]
 }
 
 model Album {
-  id       String  @id @default(uuid())
-  name     String
-  year     Int
-  artist   Artist? @relation(fields: [artistId], references: [id], onDelete: SetNull)
-  artistId String? @unique
-  Track    Track[]
+  id             String           @id @default(uuid())
+  name           String
+  year           Int
+  artist         Artist?          @relation(fields: [artistId], references: [id], onDelete: SetNull)
+  artistId       String?          @unique
+  Track          Track[]
+  favoriteAlbums FavoriteAlbums[]
 }
 
 model Track {
@@ -50,13 +54,32 @@ model Track {
   album   Album?  @relation(fields: [albumId], references: [id])
   albumId String? @unique
 
+  favoriteTracks FavoriteTracks[]
 }
 
-model ArtistsOnUser {
-    user User @relation(fields: [userId], references: [id])
-    userId String
-    artist Artist @relation(fields: [artistId], references: [id], onDelete: SetNull)
-    artistId String
+model FavoriteArtists {
+  user     User   @relation(fields: [userId], references: [id])
+  userId   String
+  artist   Artist @relation(fields: [artistId], references: [id], onDelete: Cascade)
+  artistId String
 
-    @@id([userId, artistId])
+  @@id([userId, artistId])
+}
+
+model FavoriteAlbums {
+  user    User   @relation(fields: [userId], references: [id])
+  userId  String
+  album   Album  @relation(fields: [albumId], references: [id], onDelete: Cascade)
+  albumId String
+
+  @@id([userId, albumId])
+}
+
+model FavoriteTracks {
+  user    User   @relation(fields: [userId], references: [id])
+  userId  String
+  track   Track  @relation(fields: [trackId], references: [id], onDelete: Cascade)
+  trackId String
+
+  @@id([userId, trackId])
 }

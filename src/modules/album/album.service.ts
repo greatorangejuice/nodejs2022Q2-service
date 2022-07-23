@@ -7,9 +7,7 @@ import {
 } from '@nestjs/common';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
-import { IStoreKey } from '../../common/common.models';
 import { Album } from './entities/album.entity';
-import { InMemoryDbService } from '../../common/modules/in-memory-db/in-memory-db.service';
 import { FavoritesService } from '../favorites/favorites.service';
 import { PrismaService } from '../../prisma/prisma.service';
 import { Prisma } from '@prisma/client';
@@ -19,24 +17,18 @@ export class AlbumService {
   constructor(
     @Inject(forwardRef(() => FavoritesService))
     private readonly favoritesService: FavoritesService,
-    private readonly dbService: InMemoryDbService,
     private prisma: PrismaService,
   ) {}
 
   async create(createAlbumDto: CreateAlbumDto): Promise<Album> {
     try {
-      const data: Prisma.AlbumCreateInput = {
+      const data: Prisma.AlbumCreateManyInput = {
         name: createAlbumDto.name,
         year: createAlbumDto.year,
+        artistId: createAlbumDto.artistId || undefined,
       };
-      return await this.prisma.album.create({
-        data: {
-          ...data,
-          artist: {
-            connect: { id: createAlbumDto.artistId },
-          },
-        },
-      });
+
+      return await this.prisma.album.create({ data });
     } catch (e) {
       throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
     }
@@ -54,22 +46,26 @@ export class AlbumService {
     try {
       return await this.prisma.album.findUniqueOrThrow({ where: { id } });
     } catch (e) {
-      throw new HttpException(e.message, e.status);
+      throw new HttpException(e.message, HttpStatus.NOT_FOUND);
     }
   }
 
   async update(id: string, updateAlbumDto: UpdateAlbumDto) {
-    const data: Prisma.AlbumCreateInput = {
+    let data: Prisma.AlbumUncheckedUpdateInput = {
       name: updateAlbumDto.name,
       year: updateAlbumDto.year,
+      artistId: updateAlbumDto.artistId || undefined,
     };
+    if (updateAlbumDto.artistId === '' || updateAlbumDto.artistId === null) {
+      data = {
+        ...data,
+        artistId: { set: null },
+      };
+    }
     return await this.prisma.album.update({
       where: { id },
       data: {
         ...data,
-        artist: {
-          connect: { id: updateAlbumDto.artistId },
-        },
       },
     });
   }
@@ -78,20 +74,7 @@ export class AlbumService {
     try {
       const oldAlbum = await this.findOne(id);
       if (oldAlbum) {
-        const filter = {
-          storeField: IStoreKey.track,
-          id,
-          cb: (item) => {
-            if (item.albumId === id) {
-              item.albumId = null;
-            }
-          },
-        };
-        await this.favoritesService.remove(id, IStoreKey.album);
-        await this.dbService.loopInStore(filter);
-        await this.dbService.removeElement<Album>(IStoreKey.album, oldAlbum);
-
-        return { removed: true };
+        return await this.prisma.album.delete({ where: { id } });
       }
     } catch (e) {
       throw new HttpException(e.message, e.status);

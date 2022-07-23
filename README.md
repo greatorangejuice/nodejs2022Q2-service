@@ -11,6 +11,16 @@
 git clone {repository URL}
 ```
 
+## Installing with docker
+
+```
+create .env file
+```
+
+```
+docker compose up
+```
+
 ## Installing NPM modules
 
 ```
@@ -65,8 +75,3 @@ npm run lint
 npm run format
 ```
 
-### Debugging in VSCode
-
-Press <kbd>F5</kbd> to debug.
-
-For more information, visit: https://code.visualstudio.com/docs/editor/debugging

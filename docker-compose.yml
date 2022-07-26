@@ -1,9 +1,9 @@
 version: "3.9"
 services:
 
-  postgres:
+  postgres-container:
     restart: always
-    container_name: postgres-container
+    container_name: postgres-db-container
     build:
       context: .
       dockerfile: './postgres/Dockerfile'
@@ -19,14 +19,14 @@ services:
     networks:
       - application
 
-  service:
-    container_name: nest-container
+  nest-container:
+    container_name: nest-service-container
     restart: unless-stopped
     build:
       context: .
       target: development
     depends_on:
-      - postgres
+      - postgres-container
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
@@ -35,6 +35,8 @@ services:
     command: npm run start:dev
     env_file:
       - .env
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres-container:${POSTGRES_PORT}/${POSTGRES_DB}
     networks:
       - application
 

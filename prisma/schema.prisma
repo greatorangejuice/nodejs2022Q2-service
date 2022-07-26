@@ -15,8 +15,8 @@ model User {
   login     String
   password  String
   version   Int      @default(1)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt Int
+  updatedAt Int
 
   favoriteArtists FavoriteArtists[]
   favoriteAlbums  FavoriteAlbums[]

@@ -16,7 +16,9 @@ export class UsersService {
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     try {
-      const user = await this.prisma.user.create({ data: createUserDto });
+      const time = new Date().getTime();
+      const newUser = { ...createUserDto, createdAt: +time, updatedAt: +time };
+      const user = await this.prisma.user.create({ data: newUser });
       return plainToInstance(User, user);
     } catch (e) {
       throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
@@ -56,11 +58,13 @@ export class UsersService {
         if (updateUserDto.oldPassword !== oldUser.password) {
           throw new HttpException('Wrong password', HttpStatus.FORBIDDEN);
         }
+        const time = new Date().getTime();
         const newUser = await this.prisma.user.update({
           where: { id },
           data: {
             password: updateUserDto.newPassword,
             version: oldUser.version + 1,
+            updatedAt: +time,
           },
         });
         return new User(newUser);

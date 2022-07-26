@@ -16,8 +16,8 @@ export class User {
   version: number;
   @ApiProperty({ example: 1655000000 })
   @Transform(({ value }) => new Date(value).getTime())
-  createdAt: Date;
+  createdAt: number;
   @ApiProperty({ example: 1655000000 })
   @Transform(({ value }) => new Date(value).getTime())
-  updatedAt: Date;
+  updatedAt: number;
 }

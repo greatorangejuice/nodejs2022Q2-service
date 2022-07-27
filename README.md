@@ -22,6 +22,11 @@ npm install
 ```
 create .env file using example and npm start
 ```
+or
+```
+create .env file using example run docker-compose up
+```
+For run tests you should to install project locally.
 
 After starting the app on port (4000 as default) you can open
 in your browser OpenAPI documentation by typing http://localhost:4000/doc/.

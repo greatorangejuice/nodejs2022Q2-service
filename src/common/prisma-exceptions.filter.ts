@@ -2,20 +2,12 @@ import { BaseExceptionFilter } from '@nestjs/core';
 import { ArgumentsHost, Catch, HttpStatus } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 
-@Catch()
+@Catch(Prisma.PrismaClientKnownRequestError)
 export class PrismaExceptionsFilter extends BaseExceptionFilter {
   catch(exception: Prisma.PrismaClientKnownRequestError, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
-    console.log('CATCH PRISMA ERROR');
-    // (error instanceof Prisma.PrismaClientKnownRequestError)
-    console.log('CODE', exception.code);
     switch (exception.code) {
-      case '2002': {
-        console.log('2002');
-
-        break;
-      }
       case 'P2003': {
         const status = HttpStatus.NOT_FOUND;
         const message = 'Bad id';

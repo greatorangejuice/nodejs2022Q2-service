@@ -1,18 +1,14 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { InMemoryDbService } from '../../common/modules/in-memory-db/in-memory-db.service';
 import { PrismaService } from '../../prisma/prisma.service';
-import { User as UserModel } from '@prisma/client';
+import { Prisma, User as UserModel } from '@prisma/client';
 import { User } from './entities/user.entity';
 import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class UsersService {
-  constructor(
-    private dbService: InMemoryDbService,
-    private prisma: PrismaService,
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     try {
@@ -76,5 +72,28 @@ export class UsersService {
 
   async remove(id: string) {
     return await this.prisma.user.delete({ where: { id } });
+  }
+
+  async users(params: {
+    skip?: number;
+    take?: number;
+    cursor?: Prisma.UserWhereUniqueInput;
+    where?: Prisma.UserWhereInput;
+    orderBy?: Prisma.UserOrderByWithRelationInput;
+  }): Promise<User[]> {
+    const { skip, take, cursor, where, orderBy } = params;
+    return this.prisma.user.findMany({
+      skip,
+      take,
+      cursor,
+      where,
+      orderBy,
+    });
+  }
+
+  async user(userWhereInput: Prisma.UserWhereInput): Promise<User | null> {
+    return this.prisma.user.findFirst({
+      where: userWhereInput,
+    });
   }
 }

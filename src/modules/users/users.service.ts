@@ -5,6 +5,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { Prisma, User as UserModel } from '@prisma/client';
 import { User } from './entities/user.entity';
 import { plainToInstance } from 'class-transformer';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -51,7 +52,12 @@ export class UsersService {
     try {
       const oldUser = await this.findOne(id);
       if (oldUser) {
-        if (updateUserDto.oldPassword !== oldUser.password) {
+        const comparedPassword = bcrypt.compareSync(
+          updateUserDto.oldPassword,
+          oldUser.password,
+        );
+
+        if (!comparedPassword) {
           throw new HttpException('Wrong password', HttpStatus.FORBIDDEN);
         }
         const time = new Date().getTime();

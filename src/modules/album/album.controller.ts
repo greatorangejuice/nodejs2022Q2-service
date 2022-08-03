@@ -36,13 +36,7 @@ export class AlbumController {
     status: 400,
     description: 'Bad request. body does not contain required fields',
   })
-  create(
-    @Body() createAlbumDto: CreateAlbumDto,
-    @Me() user: any,
-    @Request() req,
-  ) {
-    console.log('REQUEST', req);
-    console.log('ME USER', user);
+  create(@Body() createAlbumDto: CreateAlbumDto) {
     return this.albumService.create(createAlbumDto);
   }
 

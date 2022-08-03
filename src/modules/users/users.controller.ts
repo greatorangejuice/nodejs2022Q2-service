@@ -16,10 +16,12 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { User } from './entities/user.entity';
+import { Auth } from '../auth/auth.decorator';
 
 @Controller('user')
 @ApiTags('User')
 @UseInterceptors(ClassSerializerInterceptor)
+@Auth()
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 

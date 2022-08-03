@@ -11,9 +11,11 @@ import { FavoritesService } from './favorites.service';
 import { IStoreKey } from '../../common/common.models';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Favorite } from './entities/favorite.entity';
+import { Auth } from '../auth/auth.decorator';
 
 @Controller('favs')
 @ApiTags('Favorites')
+@Auth()
 export class FavoritesController {
   constructor(private readonly favoritesService: FavoritesService) {}
 

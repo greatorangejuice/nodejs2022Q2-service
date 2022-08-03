@@ -14,9 +14,11 @@ import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Artist } from './entities/artist.entity';
+import { Auth } from '../auth/auth.decorator';
 
 @Controller('artist')
 @ApiTags('Artist')
+@Auth()
 export class ArtistController {
   constructor(private readonly artistService: ArtistService) {}
 

@@ -16,16 +16,11 @@ export class RefreshJwtStrategy extends PassportStrategy(Strategy, 'refresh') {
   }
 
   async validate(req) {
-    // const user = await this.userService.getUserWithRolesAndPassword(
-    //   req.body.email,
-    // );
-    // if (!user) {
-    //   throw new UnauthorizedException();
-    // }
-    // return user;
-    console.log('Validate in refresh');
-    return {
-      user: { test: 123 },
-    };
+    const body = req.body as { login: string; refreshToken: string };
+    const user = await this.userService.user({ login: body.login });
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+    return user;
   }
 }

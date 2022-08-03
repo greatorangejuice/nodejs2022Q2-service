@@ -44,7 +44,10 @@ export class AuthService {
       accessToken: this.jwtService.sign(payload),
       refreshToken: this.jwtService.sign(
         { token: 'refreshToken' },
-        { expiresIn: '30d', secret: process.env.JWT_SECRET_REFRESH_KEY },
+        {
+          expiresIn: process.env.TOKEN_REFRESH_EXPIRE_TIME,
+          secret: process.env.JWT_SECRET_REFRESH_KEY,
+        },
       ),
     };
   }

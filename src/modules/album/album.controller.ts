@@ -8,6 +8,7 @@ import {
   ParseUUIDPipe,
   Post,
   Put,
+  Request,
 } from '@nestjs/common';
 import { AlbumService } from './album.service';
 import { CreateAlbumDto } from './dto/create-album.dto';
@@ -15,9 +16,12 @@ import { UpdateAlbumDto } from './dto/update-album.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Track } from '../track/entities/track.entity';
 import { Album } from './entities/album.entity';
+import { Auth } from '../auth/auth.decorator';
+import { Me } from '../auth/current-user.decorator';
 
 @Controller('album')
 @ApiTags('Album')
+@Auth()
 export class AlbumController {
   constructor(private readonly albumService: AlbumService) {}
 
@@ -32,7 +36,13 @@ export class AlbumController {
     status: 400,
     description: 'Bad request. body does not contain required fields',
   })
-  create(@Body() createAlbumDto: CreateAlbumDto) {
+  create(
+    @Body() createAlbumDto: CreateAlbumDto,
+    @Me() user: any,
+    @Request() req,
+  ) {
+    console.log('REQUEST', req);
+    console.log('ME USER', user);
     return this.albumService.create(createAlbumDto);
   }
 

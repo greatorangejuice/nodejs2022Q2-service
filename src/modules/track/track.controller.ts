@@ -14,9 +14,11 @@ import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Track } from './entities/track.entity';
+import { Auth } from '../auth/auth.decorator';
 
 @Controller('track')
 @ApiTags('Track')
+@Auth()
 export class TrackController {
   constructor(private readonly trackService: TrackService) {}
 

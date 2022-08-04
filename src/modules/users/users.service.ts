@@ -1,4 +1,9 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  LoggerService,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -18,6 +23,7 @@ export class UsersService {
       const user = await this.prisma.user.create({ data: newUser });
       return plainToInstance(User, user);
     } catch (e) {
+      // this.logger.error(e.message);
       throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
     }
   }

@@ -9,7 +9,6 @@ async function bootstrap() {
   const port = process.env.PORT || 4001;
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
-
   const { httpAdapter } = app.get(HttpAdapterHost);
   app.useGlobalFilters(new PrismaExceptionsFilter(httpAdapter));
 

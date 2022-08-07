@@ -11,6 +11,7 @@ import { Album } from './entities/album.entity';
 import { FavoritesService } from '../favorites/favorites.service';
 import { PrismaService } from '../../prisma/prisma.service';
 import { Prisma } from '@prisma/client';
+import { MyLogger } from '../../logger/logger.service';
 
 @Injectable()
 export class AlbumService {
@@ -18,6 +19,7 @@ export class AlbumService {
     @Inject(forwardRef(() => FavoritesService))
     private readonly favoritesService: FavoritesService,
     private prisma: PrismaService,
+    private logger: MyLogger,
   ) {}
 
   async create(createAlbumDto: CreateAlbumDto): Promise<Album> {
@@ -30,6 +32,7 @@ export class AlbumService {
 
       return await this.prisma.album.create({ data });
     } catch (e) {
+      this.logger.error(e.message);
       throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
     }
   }
@@ -38,6 +41,7 @@ export class AlbumService {
     try {
       return await this.prisma.album.findMany();
     } catch (e) {
+      this.logger.error(e.message);
       throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
     }
   }
@@ -46,6 +50,7 @@ export class AlbumService {
     try {
       return await this.prisma.album.findUniqueOrThrow({ where: { id } });
     } catch (e) {
+      this.logger.error(e.message);
       throw new HttpException(e.message, HttpStatus.NOT_FOUND);
     }
   }
@@ -76,7 +81,9 @@ export class AlbumService {
       if (oldAlbum) {
         return await this.prisma.album.delete({ where: { id } });
       }
+      this.logger.log('remove album');
     } catch (e) {
+      this.logger.error(e.message);
       throw new HttpException(e.message, e.status);
     }
   }

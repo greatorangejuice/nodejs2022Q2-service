@@ -12,6 +12,7 @@ import { InMemoryDbService } from '../../common/modules/in-memory-db/in-memory-d
 import { FavoritesService } from '../favorites/favorites.service';
 import { PrismaService } from '../../prisma/prisma.service';
 import { Artist as ArtistModel } from '@prisma/client';
+import { MyLogger } from '../../logger/logger.service';
 
 @Injectable()
 export class ArtistService {
@@ -20,12 +21,14 @@ export class ArtistService {
     private readonly favoritesService: FavoritesService,
     private readonly dbService: InMemoryDbService,
     private readonly prisma: PrismaService,
+    private readonly logger: MyLogger,
   ) {}
 
   async create(createArtistDto: CreateArtistDto): Promise<ArtistModel> {
     try {
       return await this.prisma.artist.create({ data: createArtistDto });
     } catch (e) {
+      this.logger.error(e.message);
       throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
     }
   }
@@ -34,6 +37,7 @@ export class ArtistService {
     try {
       return await this.prisma.artist.findMany();
     } catch (e) {
+      this.logger.error(e.message);
       throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
     }
   }
@@ -42,6 +46,7 @@ export class ArtistService {
     try {
       return await this.prisma.artist.findUniqueOrThrow({ where: { id } });
     } catch (e) {
+      this.logger.error(e.message);
       throw new HttpException(e.message, HttpStatus.NOT_FOUND);
     }
   }
@@ -55,35 +60,5 @@ export class ArtistService {
 
   async remove(id: string) {
     return await this.prisma.artist.delete({ where: { id } });
-    // try {
-    //   const oldArtist = await this.findOne(id);
-    //   if (oldArtist) {
-    //     const albumFilter = {
-    //       storeField: IStoreKey.album,
-    //       id,
-    //       cb: (item) => {
-    //         if (item.artistId === id) {
-    //           item.artistId = null;
-    //         }
-    //       },
-    //     };
-    //     await this.dbService.loopInStore(albumFilter);
-    //     const trackFilter = {
-    //       storeField: IStoreKey.track,
-    //       id,
-    //       cb: (item) => {
-    //         if (item.artistId === id) {
-    //           item.artistId = null;
-    //         }
-    //       },
-    //     };
-    //     await this.dbService.loopInStore(trackFilter);
-    //     await this.favoritesService.remove(id, IStoreKey.artist);
-    //     await this.dbService.removeElement<Artist>(IStoreKey.artist, oldArtist);
-    //     return { removed: true };
-    //   }
-    // } catch (e) {
-    //   throw new HttpException(e.message, e.status);
-    // }
   }
 }

@@ -7,12 +7,10 @@ import {
 } from '@nestjs/common';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
-import { Track } from './entities/track.entity';
-import { IStoreKey } from '../../common/common.models';
-import { InMemoryDbService } from '../../common/modules/in-memory-db/in-memory-db.service';
 import { FavoritesService } from '../favorites/favorites.service';
 import { PrismaService } from '../../prisma/prisma.service';
 import { Prisma, Track as TrackModel } from '@prisma/client';
+import { MyLogger } from '../../logger/logger.service';
 
 @Injectable()
 export class TrackService {
@@ -20,7 +18,10 @@ export class TrackService {
     @Inject(forwardRef(() => FavoritesService))
     private readonly favoritesService: FavoritesService,
     private prisma: PrismaService,
-  ) {}
+    private logger: MyLogger,
+  ) {
+    this.logger.setContext(TrackService.name);
+  }
 
   async create(createTrackDto: CreateTrackDto): Promise<TrackModel> {
     try {
@@ -38,6 +39,9 @@ export class TrackService {
 
   async findAll(): Promise<TrackModel[]> {
     try {
+      this.logger.debug('Debug tracks');
+      this.logger.log('Debug tracks');
+      this.logger.error('Debug tracks');
       return await this.prisma.track.findMany();
     } catch (e) {
       throw new HttpException(e.message, HttpStatus.BAD_REQUEST);

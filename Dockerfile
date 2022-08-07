@@ -2,7 +2,7 @@ FROM node:16-alpine AS development
 WORKDIR /usr/src/app
 COPY . .
 
-RUN npm ci &&  npm cache clean --force
+RUN npm install &&  npm cache clean --force
 RUN npx prisma generate
 RUN npm run build
 RUN npm prune --production

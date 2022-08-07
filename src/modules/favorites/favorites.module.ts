@@ -6,6 +6,7 @@ import { ArtistModule } from '../artist/artist.module';
 import { AlbumModule } from '../album/album.module';
 import { FavoritesService } from './favorites.service';
 import { PrismaModule } from '../../prisma/prisma.module';
+import { LoggerModule } from '../../logger/logger.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { PrismaModule } from '../../prisma/prisma.module';
     forwardRef(() => ArtistModule),
     forwardRef(() => AlbumModule),
     PrismaModule,
+    LoggerModule,
   ],
   controllers: [FavoritesController],
   providers: [FavoritesService],

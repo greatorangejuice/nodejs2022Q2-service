@@ -1,27 +1,44 @@
-import { Injectable, Scope, ConsoleLogger, LogLevel } from '@nestjs/common';
+import { ConsoleLogger, Injectable, LogLevel } from '@nestjs/common';
+import { writeLog } from './utils';
 
-@Injectable({ scope: Scope.TRANSIENT })
+@Injectable()
 export class MyLogger extends ConsoleLogger {
-  public levels: Array<LogLevel> = ['error', 'warn', 'log', 'verbose', 'debug'];
-
   constructor() {
-    super();
-    this.setLogLevels(this.levels);
-  }
+    const levels: Array<LogLevel> = [
+      'error',
+      'warn',
+      'log',
+      'verbose',
+      'debug',
+    ];
+    const LOG_LEVEL = parseInt(process.env.LOG_LEVEL) || 4;
 
-  customLog() {
-    this.log('Please feed the cat!');
+    super();
+    this.setLogLevels(levels.slice(0, LOG_LEVEL));
   }
 
   error(message: any, stack?: string, context?: string) {
     super.error(message, stack, context);
+    writeLog(message + '\n');
   }
 
   warn(message: any, context?: string) {
     super.warn(message, context);
+    writeLog(message + '\n');
   }
 
-  setLogLevels(levels: LogLevel[]) {
-    super.setLogLevels(levels);
+  log(message: any, ...optionalParams: any[]): any {
+    super.log(message, ...optionalParams);
+    writeLog(message + '\n');
+  }
+
+  debug(message: any, context?: string) {
+    super.debug(message, context);
+    writeLog(message + '\n');
+  }
+
+  verbose(message: any, context?: string) {
+    super.verbose(message, context);
+    writeLog(message + '\n');
   }
 }

@@ -12,6 +12,7 @@ import { ArtistService } from '../artist/artist.service';
 import { AlbumService } from '../album/album.service';
 import { PrismaService } from '../../prisma/prisma.service';
 import { Prisma } from '@prisma/client';
+import { MyLogger } from '../../logger/logger.service';
 
 @Injectable()
 export class FavoritesService {
@@ -22,6 +23,7 @@ export class FavoritesService {
     private readonly trackService: TrackService,
     private readonly albumService: AlbumService,
     private readonly prisma: PrismaService,
+    private readonly logger: MyLogger,
   ) {}
 
   async addArtist(id: string) {
@@ -45,6 +47,7 @@ export class FavoritesService {
       if (e.status === HttpStatus.NOT_FOUND) {
         e.status = HttpStatus.UNPROCESSABLE_ENTITY;
       }
+      this.logger.error(e.message);
       throw new HttpException(e.message, e.status);
     }
   }
@@ -70,6 +73,7 @@ export class FavoritesService {
       if (e.status === HttpStatus.NOT_FOUND) {
         e.status = HttpStatus.UNPROCESSABLE_ENTITY;
       }
+      this.logger.error(e.message);
       throw new HttpException(e.message, e.status);
     }
   }
@@ -95,6 +99,7 @@ export class FavoritesService {
       if (e.status === HttpStatus.NOT_FOUND) {
         e.status = HttpStatus.UNPROCESSABLE_ENTITY;
       }
+      this.logger.error(e.message);
       throw new HttpException(e.message, e.status);
     }
   }
@@ -118,6 +123,7 @@ export class FavoritesService {
     const mappedTracks = tracks.map((track) => {
       return track.track;
     });
+    this.logger.verbose('TEST VERBOSE');
     return {
       artists: mappedArtists,
       albums: mappedAlbums,

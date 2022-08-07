@@ -1,9 +1,4 @@
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  LoggerService,
-} from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -11,19 +6,23 @@ import { Prisma, User as UserModel } from '@prisma/client';
 import { User } from './entities/user.entity';
 import { plainToInstance } from 'class-transformer';
 import * as bcrypt from 'bcrypt';
+import { MyLogger } from '../../logger/logger.service';
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private logger: MyLogger) {
+    this.logger.setContext(UsersService.name);
+  }
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     try {
       const time = new Date().getTime();
       const newUser = { ...createUserDto, createdAt: +time, updatedAt: +time };
       const user = await this.prisma.user.create({ data: newUser });
+      this.logger.log('Creating user');
       return plainToInstance(User, user);
     } catch (e) {
-      // this.logger.error(e.message);
+      this.logger.error(e.message);
       throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
     }
   }
@@ -40,6 +39,7 @@ export class UsersService {
         },
       });
     } catch (e) {
+      this.logger.error(e.message);
       throw new HttpException(e.message, e.status);
     }
   }
@@ -50,6 +50,7 @@ export class UsersService {
         where: { id },
       });
     } catch (e) {
+      this.logger.error(e.message);
       throw new HttpException(e.message, HttpStatus.NOT_FOUND);
     }
   }
@@ -78,6 +79,7 @@ export class UsersService {
         return new User(newUser);
       }
     } catch (e) {
+      this.logger.error(e.message);
       throw new HttpException(e.message, e.status);
     }
   }

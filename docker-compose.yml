@@ -1,0 +1,65 @@
+version: "3.9"
+services:
+
+  postgres-container:
+    restart: always
+    container_name: postgres-db-container
+    build:
+      context: .
+      dockerfile: './postgres/Dockerfile'
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    volumes:
+      - .:/var/lib/postgresql/data
+    ports:
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
+    networks:
+      - application
+
+  nest-container:
+    container_name: nest-service-container
+    restart: unless-stopped
+    build:
+      context: .
+      target: development
+    depends_on:
+      - postgres-container
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - ${PORT}:${PORT}
+    command: npm run start:dev
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres-container:${POSTGRES_PORT}/${POSTGRES_DB}
+    networks:
+      - application
+
+  pgadmin:
+    container_name: pgadmin_container
+    image: dpage/pgadmin4:latest
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "habrpguser@habr.com"
+      PGADMIN_DEFAULT_PASSWORD: "pgadminpwd4habr"
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+    volumes:
+      - ./pgadmin:/var/lib/pgadmin
+    ports:
+      - "5050:80"
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 1G
+    networks:
+      - application
+
+networks:
+  application:
+    driver: bridge

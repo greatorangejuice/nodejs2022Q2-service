@@ -1,0 +1,139 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  login     String
+  password  String
+  version   Int      @default(1)
+  createdAt Int
+  updatedAt Int
+
+  favoriteArtists FavoriteArtists[]
+  favoriteAlbums  FavoriteAlbums[]
+  favoriteTracks  FavoriteTracks[]
+}
+
+model Artist {
+  id     String  @id @default(uuid())
+  name   String
+  grammy Boolean
+
+  Track           Track[]
+  Album           Album[]
+  favoriteArtists FavoriteArtists[]
+  ArtistFavs      ArtistFavs[]
+}
+
+model Album {
+  id             String           @id @default(uuid())
+  name           String
+  year           Int
+  artist         Artist?          @relation(fields: [artistId], references: [id], onDelete: SetNull)
+  artistId       String?          @unique
+  Track          Track[]
+  favoriteAlbums FavoriteAlbums[]
+  AlbumsFavs     AlbumsFavs[]
+}
+
+model Track {
+  id       String @id @default(uuid())
+  name     String
+  duration Int    @default(0)
+
+  artist   Artist? @relation(fields: [artistId], references: [id])
+  artistId String? @unique
+
+  album   Album?  @relation(fields: [albumId], references: [id])
+  albumId String? @unique
+
+  favoriteTracks FavoriteTracks[]
+  TracksFavs     TracksFavs[]
+}
+
+model FavoriteArtists {
+  user     User   @relation(fields: [userId], references: [id])
+  userId   String
+  artist   Artist @relation(fields: [artistId], references: [id], onDelete: Cascade)
+  artistId String
+
+  @@id([userId, artistId])
+}
+
+model FavoriteAlbums {
+  user    User   @relation(fields: [userId], references: [id])
+  userId  String
+  album   Album  @relation(fields: [albumId], references: [id], onDelete: Cascade)
+  albumId String
+
+  @@id([userId, albumId])
+}
+
+model FavoriteTracks {
+  user    User   @relation(fields: [userId], references: [id])
+  userId  String
+  track   Track  @relation(fields: [trackId], references: [id], onDelete: Cascade)
+  trackId String
+
+  @@id([userId, trackId])
+}
+
+model ArtistFavs {
+  id       String
+  artist   Artist @relation(fields: [artistId], references: [id], onDelete: Cascade)
+  artistId String
+
+  @@id([artistId])
+}
+
+model AlbumsFavs {
+  id      String
+  album   Album  @relation(fields: [albumId], references: [id], onDelete: Cascade)
+  albumId String
+
+  @@id([albumId])
+}
+
+model TracksFavs {
+  id      String
+  track   Track  @relation(fields: [trackId], references: [id], onDelete: Cascade)
+  trackId String
+
+  @@id([trackId])
+}
+
+//model FavoriteArtists {
+//  user     User   @relation(fields: [userId], references: [id])
+//  userId   String
+//  artist   Artist @relation(fields: [artistId], references: [id], onDelete: Cascade)
+//  artistId String
+//
+//  @@id([userId, artistId])
+//}
+//
+//model FavoriteAlbums {
+//  user    User   @relation(fields: [userId], references: [id])
+//  userId  String
+//  album   Album  @relation(fields: [albumId], references: [id], onDelete: Cascade)
+//  albumId String
+//
+//  @@id([userId, albumId])
+//}
+//
+//model FavoriteTracks {
+//  user    User   @relation(fields: [userId], references: [id])
+//  userId  String
+//  track   Track  @relation(fields: [trackId], references: [id], onDelete: Cascade)
+//  trackId String
+//
+//  @@id([userId, trackId])
+//}
